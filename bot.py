@@ -44,18 +44,18 @@ def get_ask_link(user_id: int) -> str:
 
 def main_menu_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔗 Моя ссылка", callback_data="menu_link")],
+        [InlineKeyboardButton(text="Моя ссылка", callback_data="menu_link")],
         [
-            InlineKeyboardButton(text="📥 Вопросы", callback_data="menu_questions"),
-            InlineKeyboardButton(text="📊 Статистика", callback_data="menu_stats"),
+            InlineKeyboardButton(text="Вопросы", callback_data="menu_questions"),
+            InlineKeyboardButton(text="Статистика", callback_data="menu_stats"),
         ],
-        [InlineKeyboardButton(text="❓ Помощь", callback_data="menu_help")],
+        [InlineKeyboardButton(text="Помощь", callback_data="menu_help")],
     ])
 
 
 def cancel_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")]
+        [InlineKeyboardButton(text="Отмена", callback_data="cancel")]
     ])
 
 
@@ -70,13 +70,13 @@ async def cmd_start(message: Message, state: FSMContext):
         target_id = int(args[4:])
         target = await db.get_user(target_id)
         if not target:
-            await message.answer("😔 Пользователь не найден. Возможно, он ещё не запускал бота.")
+            await message.answer("Пользователь не найден. Возможно, он ещё не запускал бота.")
             return
         target_name = target["first_name"] or target["username"] or "Пользователь"
         await state.set_state(AskStates.waiting_for_question)
         await state.update_data(target_id=target_id)
         await message.answer(
-            f"👻 Анонимный вопрос для <b>{target_name}</b>\n\n"
+            f"Анонимный вопрос для <b>{target_name}</b>\n\n"
             f"Напиши свой вопрос ниже. Отправитель останется неизвестным.\n\n"
             f"<i>Твоё имя нигде не появится.</i>",
             parse_mode="HTML",
@@ -85,12 +85,12 @@ async def cmd_start(message: Message, state: FSMContext):
     else:
         link = get_ask_link(message.from_user.id)
         await message.answer(
-            f"👋 Привет, <b>{message.from_user.first_name}</b>!\n\n"
-            f"Я — бот для анонимных вопросов. Поделись ссылкой — и тебе смогут "
+            f"Привет, <b>{message.from_user.first_name}</b>!\n\n"
+            f"Бот для анонимных вопросов. Поделись ссылкой — и тебе смогут "
             f"задавать вопросы анонимно.\n\n"
-            f"🔗 <b>Твоя ссылка:</b>\n<code>{link}</code>\n\n"
-            f"📱 <b>Вставь в био так:</b>\n"
-            f"<code>👻 Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</code>\n\n"
+            f"<b>Твоя ссылка:</b>\n<code>{link}</code>\n\n"
+            f"<b>Вставь в био так:</b>\n"
+            f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</code>\n\n"
             f"<i>Нажми на ссылку выше, чтобы скопировать</i>",
             parse_mode="HTML",
             reply_markup=main_menu_kb(),
@@ -102,10 +102,10 @@ async def cmd_link(message: Message):
     await db.register_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
     link = get_ask_link(message.from_user.id)
     await message.answer(
-        f"🔗 <b>Твоя ссылка для анонимных вопросов:</b>\n\n"
+        f"<b>Твоя ссылка для анонимных вопросов:</b>\n\n"
         f"<code>{link}</code>\n\n"
-        f"📱 <b>Для био:</b>\n"
-        f"<code>👻 Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</code>",
+        f"<b>Для био:</b>\n"
+        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</code>",
         parse_mode="HTML",
     )
 
@@ -113,17 +113,17 @@ async def cmd_link(message: Message):
 @router.message(Command("help"))
 async def cmd_help(message: Message):
     await message.answer(
-        "📖 <b>Как пользоваться ботом</b>\n\n"
-        "🔗 <b>Получить ссылку</b> — /link\n"
+        "<b>Как пользоваться ботом</b>\n\n"
+        "<b>Получить ссылку</b> — /link\n"
         "Вставь её в био Telegram, чтобы люди могли задавать тебе анонимные вопросы\n\n"
-        "📥 <b>Мои вопросы</b> — /myquestions\n"
+        "<b>Мои вопросы</b> — /myquestions\n"
         "Показывает все неотвеченные вопросы\n\n"
-        "📊 <b>Статистика</b> — /stats\n"
+        "<b>Статистика</b> — /stats\n"
         "Сколько вопросов получено и отвечено\n\n"
-        "❌ <b>Отмена</b> — нажми кнопку «Отмена»\n"
+        "<b>Отмена</b> — нажми кнопку «Отмена»\n"
         "во время написания вопроса или ответа\n\n"
-        "💡 <b>Совет:</b> добавь в био текст вида:\n"
-        "<code>👻 Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</code>",
+        "<b>Совет:</b> добавь в био текст вида:\n"
+        "<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</code>",
         parse_mode="HTML",
     )
 
@@ -132,16 +132,16 @@ async def cmd_help(message: Message):
 async def cmd_myquestions(message: Message):
     questions = await db.get_unanswered_questions(message.from_user.id)
     if not questions:
-        await message.answer("📭 Нет неотвеченных вопросов. Всё чисто! 🎉")
+        await message.answer("Нет неотвеченных вопросов.")
         return
 
-    await message.answer(f"📥 <b>Неотвеченные вопросы ({len(questions)}):</b>", parse_mode="HTML")
+    await message.answer(f"<b>Неотвеченные вопросы ({len(questions)}):</b>", parse_mode="HTML")
     for q in questions[:10]:
         kb = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="💬 Ответить", callback_data=f"answer_{q['id']}")]
+            [InlineKeyboardButton(text="Ответить", callback_data=f"answer_{q['id']}")]
         ])
         await message.answer(
-            f"❓ {q['text']}",
+            f"{q['text']}",
             reply_markup=kb,
         )
 
@@ -150,10 +150,10 @@ async def cmd_myquestions(message: Message):
 async def cmd_stats(message: Message):
     total_q, answered_q, unanswered_q = await db.get_user_stats(message.from_user.id)
     await message.answer(
-        f"📊 <b>Твоя статистика</b>\n\n"
-        f"📨 Получено вопросов: <b>{total_q}</b>\n"
-        f"✅ Отвечено: <b>{answered_q}</b>\n"
-        f"⏳ Ожидает ответа: <b>{unanswered_q}</b>",
+        f"<b>Твоя статистика</b>\n\n"
+        f"Получено вопросов: <b>{total_q}</b>\n"
+        f"Отвечено: <b>{answered_q}</b>\n"
+        f"Ожидает ответа: <b>{unanswered_q}</b>",
         parse_mode="HTML",
     )
 
@@ -163,14 +163,14 @@ async def callback_menu_link(callback: CallbackQuery):
     await db.register_user(callback.from_user.id, callback.from_user.username, callback.from_user.first_name)
     link = get_ask_link(callback.from_user.id)
     await callback.message.edit_text(
-        f"🔗 <b>Твоя ссылка для анонимных вопросов:</b>\n\n"
+        f"<b>Твоя ссылка для анонимных вопросов:</b>\n\n"
         f"<code>{link}</code>\n\n"
-        f"📱 <b>Вставь в био так:</b>\n"
-        f"<code>👻 Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</code>\n\n"
+        f"<b>Вставь в био так:</b>\n"
+        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</code>\n\n"
         f"<i>Нажми на ссылку, чтобы скопировать</i>",
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="◀️ Назад", callback_data="menu_back")]
+            [InlineKeyboardButton(text="Назад", callback_data="menu_back")]
         ]),
     )
     await callback.answer()
@@ -180,9 +180,9 @@ async def callback_menu_link(callback: CallbackQuery):
 async def callback_menu_questions(callback: CallbackQuery):
     questions = await db.get_unanswered_questions(callback.from_user.id)
     if not questions:
-        text = "📭 Нет неотвеченных вопросов. Всё чисто! 🎉"
+        text = "Нет неотвеченных вопросов."
     else:
-        text = f"📥 <b>Неотвеченные вопросы ({len(questions)}):</b>\n\n"
+        text = f"<b>Неотвеченные вопросы ({len(questions)}):</b>\n\n"
         for i, q in enumerate(questions[:10], 1):
             text += f"<b>{i}.</b> {q['text']}\n\n"
 
@@ -190,7 +190,7 @@ async def callback_menu_questions(callback: CallbackQuery):
         text,
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="◀️ Назад", callback_data="menu_back")]
+            [InlineKeyboardButton(text="Назад", callback_data="menu_back")]
         ]),
     )
     await callback.answer()
@@ -200,13 +200,13 @@ async def callback_menu_questions(callback: CallbackQuery):
 async def callback_menu_stats(callback: CallbackQuery):
     total_q, answered_q, unanswered_q = await db.get_user_stats(callback.from_user.id)
     await callback.message.edit_text(
-        f"📊 <b>Твоя статистика</b>\n\n"
-        f"📨 Получено вопросов: <b>{total_q}</b>\n"
-        f"✅ Отвечено: <b>{answered_q}</b>\n"
-        f"⏳ Ожидает ответа: <b>{unanswered_q}</b>",
+        f"<b>Твоя статистика</b>\n\n"
+        f"Получено вопросов: <b>{total_q}</b>\n"
+        f"Отвечено: <b>{answered_q}</b>\n"
+        f"Ожидает ответа: <b>{unanswered_q}</b>",
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="◀️ Назад", callback_data="menu_back")]
+            [InlineKeyboardButton(text="Назад", callback_data="menu_back")]
         ]),
     )
     await callback.answer()
@@ -215,20 +215,20 @@ async def callback_menu_stats(callback: CallbackQuery):
 @router.callback_query(F.data == "menu_help")
 async def callback_menu_help(callback: CallbackQuery):
     await callback.message.edit_text(
-        "📖 <b>Как пользоваться ботом</b>\n\n"
-        "🔗 <b>Получить ссылку</b> — /link\n"
+        "<b>Как пользоваться ботом</b>\n\n"
+        "<b>Получить ссылку</b> — /link\n"
         "Вставь её в био Telegram\n\n"
-        "📥 <b>Мои вопросы</b> — /myquestions\n"
+        "<b>Мои вопросы</b> — /myquestions\n"
         "Показывает неотвеченные вопросы\n\n"
-        "📊 <b>Статистика</b> — /stats\n"
+        "<b>Статистика</b> — /stats\n"
         "Сколько вопросов получено/отвечено\n\n"
-        "❌ <b>Отмена</b> — кнопка «Отмена»\n"
+        "<b>Отмена</b> — кнопка «Отмена»\n"
         "при написании вопроса или ответа\n\n"
-        "💡 <b>Совет:</b> добавь в био:\n"
-        f"<code>👻 Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</code>",
+        "<b>Совет:</b> добавь в био:\n"
+        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</code>",
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="◀️ Назад", callback_data="menu_back")]
+            [InlineKeyboardButton(text="Назад", callback_data="menu_back")]
         ]),
     )
     await callback.answer()
@@ -238,10 +238,10 @@ async def callback_menu_help(callback: CallbackQuery):
 async def callback_menu_back(callback: CallbackQuery):
     link = get_ask_link(callback.from_user.id)
     await callback.message.edit_text(
-        f"👻 <b>GhostAnon</b> — анонимные вопросы\n\n"
-        f"🔗 <b>Твоя ссылка:</b>\n<code>{link}</code>\n\n"
-        f"📱 <b>Вставь в био:</b>\n"
-        f"<code>👻 Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</code>",
+        f"<b>GhostAnon</b> — анонимные вопросы\n\n"
+        f"<b>Твоя ссылка:</b>\n<code>{link}</code>\n\n"
+        f"<b>Вставь в био:</b>\n"
+        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</code>",
         parse_mode="HTML",
         reply_markup=main_menu_kb(),
     )
@@ -251,11 +251,11 @@ async def callback_menu_back(callback: CallbackQuery):
 @router.callback_query(F.data == "cancel")
 async def callback_cancel(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text("❌ Отменено.", reply_markup=None)
+    await callback.message.edit_text("Отменено.", reply_markup=None)
     link = get_ask_link(callback.from_user.id)
     await callback.message.answer(
-        f"👻 <b>GhostAnon</b> — анонимные вопросы\n\n"
-        f"🔗 <b>Твоя ссылка:</b>\n<code>{link}</code>",
+        f"<b>GhostAnon</b> — анонимные вопросы\n\n"
+        f"<b>Твоя ссылка:</b>\n<code>{link}</code>",
         parse_mode="HTML",
         reply_markup=main_menu_kb(),
     )
@@ -272,20 +272,20 @@ async def process_question(message: Message, state: FSMContext):
     target_id = data.get("target_id")
     if not target_id:
         await state.clear()
-        await message.answer("😔 Ошибка. Попробуй перейти по ссылке ещё раз.")
+        await message.answer("Ошибка. Попробуй перейти по ссылке ещё раз.")
         return
 
     q_id = await db.save_question(target_id, message.from_user.id, message.text)
 
     await state.clear()
-    await message.answer("✅ Вопрос отправлен анонимно! 📤")
+    await message.answer("Вопрос отправлен анонимно!")
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💬 Ответить", callback_data=f"answer_{q_id}")]
+        [InlineKeyboardButton(text="Ответить", callback_data=f"answer_{q_id}")]
     ])
     await bot.send_message(
         target_id,
-        f"📬 <b>Новый анонимный вопрос:</b>\n\n❓ {message.text}",
+        f"<b>Новый анонимный вопрос:</b>\n\n{message.text}",
         parse_mode="HTML",
         reply_markup=kb,
     )
@@ -302,7 +302,7 @@ async def callback_answer(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AskStates.waiting_for_answer)
     await state.update_data(question_id=q_id, sender_id=question["sender_user_id"])
     await callback.message.answer(
-        f"💬 <b>Напиши ответ на вопрос:</b>\n\n❓ {question['text']}",
+        f"<b>Напиши ответ на вопрос:</b>\n\n{question['text']}",
         parse_mode="HTML",
         reply_markup=cancel_kb(),
     )
@@ -320,12 +320,12 @@ async def process_answer(message: Message, state: FSMContext):
     sender_id = data.get("sender_id")
     if not q_id:
         await state.clear()
-        await message.answer("😔 Ошибка. Попробуй ещё раз.")
+        await message.answer("Ошибка. Попробуй ещё раз.")
         return
 
     await db.save_answer(q_id, message.text)
     await state.clear()
-    await message.answer("✅ Ответ отправлен! 📤", reply_markup=main_menu_kb())
+    await message.answer("Ответ отправлен!", reply_markup=main_menu_kb())
 
     if sender_id:
         try:
@@ -333,9 +333,9 @@ async def process_answer(message: Message, state: FSMContext):
             q_text = question["text"] if question else "..."
             await bot.send_message(
                 sender_id,
-                f"📬 <b>Ответ на твой анонимный вопрос:</b>\n\n"
-                f"❓ {q_text}\n\n"
-                f"💬 {message.text}",
+                f"<b>Ответ на твой анонимный вопрос:</b>\n\n"
+                f"{q_text}\n\n"
+                f"{message.text}",
                 parse_mode="HTML",
             )
         except Exception:
@@ -350,10 +350,10 @@ async def on_startup(bot: Bot):
         globals()["BOT_USERNAME"] = me.username
 
     await bot.set_my_commands([
-        BotCommand(command="link", description="🔗 Моя ссылка"),
-        BotCommand(command="myquestions", description="📥 Неотвеченные вопросы"),
-        BotCommand(command="stats", description="📊 Статистика"),
-        BotCommand(command="help", description="❓ Помощь"),
+        BotCommand(command="link", description="Моя ссылка"),
+        BotCommand(command="myquestions", description="Неотвеченные вопросы"),
+        BotCommand(command="stats", description="Статистика"),
+        BotCommand(command="help", description="Помощь"),
     ])
 
     if WEBHOOK_URL:
