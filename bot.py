@@ -278,17 +278,42 @@ async def process_question(message: Message, state: FSMContext):
     q_id = await db.save_question(target_id, message.from_user.id, message.text)
 
     await state.clear()
-    await message.answer("Вопрос отправлен анонимно!")
+    await message.answer(
+        "Вопрос отправлен анонимно!",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Задать ещё", callback_data=f"askmore_{target_id}")]
+        ]),
+    )
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Ответить", callback_data=f"answer_{q_id}")]
     ])
     await bot.send_message(
         target_id,
-        f"<b>Новый анонимный вопрос:</b>\n\n{message.text}",
+        f"<b>Новый анонимный вопрос:</b>\n\n<code>{message.text}</code>",
         parse_mode="HTML",
         reply_markup=kb,
     )
+
+
+@router.callback_query(F.data.startswith("askmore_"))
+async def callback_ask_more(callback: CallbackQuery, state: FSMContext):
+    target_id = int(callback.data[8:])
+    target = await db.get_user(target_id)
+    if not target:
+        await callback.answer("Пользователь не найден.", show_alert=True)
+        return
+    target_name = target["first_name"] or target["username"] or "Пользователь"
+    await state.set_state(AskStates.waiting_for_question)
+    await state.update_data(target_id=target_id)
+    await callback.message.answer(
+        f"Анонимный вопрос для <b>{target_name}</b>\n\n"
+        f"Напиши свой вопрос ниже. Отправитель останется неизвестным.\n\n"
+        f"<i>Твоё имя нигде не появится.</i>",
+        parse_mode="HTML",
+        reply_markup=cancel_kb(),
+    )
+    await callback.answer()
 
 
 @router.callback_query(F.data.startswith("answer_"))
@@ -302,7 +327,7 @@ async def callback_answer(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AskStates.waiting_for_answer)
     await state.update_data(question_id=q_id, sender_id=question["sender_user_id"])
     await callback.message.answer(
-        f"<b>Напиши ответ на вопрос:</b>\n\n{question['text']}",
+        f"<b>Напиши ответ на вопрос:</b>\n\n<code>{question['text']}</code>",
         parse_mode="HTML",
         reply_markup=cancel_kb(),
     )
@@ -331,12 +356,14 @@ async def process_answer(message: Message, state: FSMContext):
         try:
             question = await db.get_question_by_id(q_id)
             q_text = question["text"] if question else "..."
+            ask_more_kb = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Задать ещё", callback_data=f"askmore_{message.from_user.id}")]
+            ])
             await bot.send_message(
                 sender_id,
-                f"<b>Ответ на твой анонимный вопрос:</b>\n\n"
-                f"{q_text}\n\n"
-                f"{message.text}",
+                f"<b>Ответ на твой анонимный вопрос:</b>\n\n<code>{q_text}</code>\n\n{message.text}",
                 parse_mode="HTML",
+                reply_markup=ask_more_kb,
             )
         except Exception:
             pass
