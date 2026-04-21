@@ -370,11 +370,15 @@ async def process_answer(message: Message, state: FSMContext):
 
 
 async def on_startup(bot: Bot):
+    print(f"[STARTUP] Initializing database...")
     await db.init_db()
+    print(f"[STARTUP] Database initialized")
+
     if not BOT_USERNAME:
         me = await bot.me()
         os.environ["BOT_USERNAME"] = me.username
         globals()["BOT_USERNAME"] = me.username
+    print(f"[STARTUP] Bot username: {BOT_USERNAME}")
 
     await bot.set_my_commands([
         BotCommand(command="link", description="Моя ссылка"),
@@ -382,12 +386,14 @@ async def on_startup(bot: Bot):
         BotCommand(command="stats", description="Статистика"),
         BotCommand(command="help", description="Помощь"),
     ])
+    print(f"[STARTUP] Bot commands set")
 
     if WEBHOOK_URL:
         await bot.set_webhook(WEBHOOK_URL)
-        logger.info(f"Webhook set to {WEBHOOK_URL}")
+        print(f"[STARTUP] Webhook set to {WEBHOOK_URL}")
     else:
-        logger.warning("WEBHOOK_HOST not set, webhook not configured")
+        print(f"[STARTUP] WARNING: WEBHOOK_HOST not set, webhook not configured")
+        print(f"[STARTUP] RENDER_EXTERNAL_HOSTNAME={os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'NOT SET')}")
 
 
 async def on_shutdown(bot: Bot):
@@ -396,12 +402,14 @@ async def on_shutdown(bot: Bot):
 
 
 async def on_app_startup(app):
-    logger.info("on_app_startup called")
+    print(f"[STARTUP] on_app_startup called")
     try:
         await on_startup(bot)
-        logger.info("on_startup completed successfully")
+        print(f"[STARTUP] on_startup completed successfully")
     except Exception as e:
-        logger.error(f"on_startup failed: {e}")
+        print(f"[STARTUP] FAILED: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 async def on_app_shutdown(app):
@@ -420,7 +428,7 @@ def main():
             update = Update.model_validate(data, context={"bot": bot})
             await dp.feed_update(bot, update)
         except Exception as e:
-            logger.error(f"Webhook handler error: {e}")
+            print(f"[WEBHOOK ERROR] {e}")
         return web.Response(text="ok")
 
     async def health_check(request):
@@ -429,7 +437,7 @@ def main():
     app.router.add_post(WEBHOOK_PATH, handle_webhook)
     app.router.add_get("/", health_check)
 
-    logger.info(f"Starting bot on port {WEBAPP_PORT}, webhook_url={WEBHOOK_URL}")
+    print(f"[STARTUP] Starting on port {WEBAPP_PORT}, webhook_url={WEBHOOK_URL}")
     web.run_app(app, host="0.0.0.0", port=WEBAPP_PORT)
 
 
