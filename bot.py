@@ -105,7 +105,7 @@ async def cmd_link(message: Message):
         f"<b>Твоя ссылка для анонимных вопросов:</b>\n\n"
         f"<blockquote>{link}</blockquote>\n"
         f"<b>Для био:</b>\n"
-        f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</blockquote>"
+        f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</blockquote>",
         parse_mode="HTML",
     )
 
