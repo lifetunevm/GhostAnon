@@ -290,7 +290,7 @@ async def process_question(message: Message, state: FSMContext):
     ])
     await bot.send_message(
         target_id,
-        f"<b>Новый анонимный вопрос:</b>\n\n<blockquote>{message.text}</blockquote>",
+        f"<b>Новый анонимный вопрос:</b>\n<blockquote>{message.text}</blockquote>",
         parse_mode="HTML",
         reply_markup=kb,
     )
@@ -327,7 +327,7 @@ async def callback_answer(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AskStates.waiting_for_answer)
     await state.update_data(question_id=q_id, sender_id=question["sender_user_id"])
     prompt = await callback.message.answer(
-        f"<b>Напиши ответ на вопрос:</b>\n\n<blockquote>{question['text']}</blockquote>",
+        f"<b>Напиши ответ на вопрос:</b>\n<blockquote>{question['text']}</blockquote>",
         parse_mode="HTML",
         reply_markup=cancel_kb(),
     )
@@ -364,7 +364,7 @@ async def process_answer(message: Message, state: FSMContext):
     except Exception:
         pass
 
-    await message.answer("Ответ отправлен!", reply_markup=main_menu_kb())
+    await message.answer("Ответ отправлен!")
 
     if sender_id:
         try:
@@ -375,7 +375,7 @@ async def process_answer(message: Message, state: FSMContext):
             ])
             await bot.send_message(
                 sender_id,
-                f"<b>Ответ на твой анонимный вопрос:</b>\n\n<blockquote>{q_text}</blockquote>\n\n{message.text}",
+                f"<b>Ответ на твой анонимный вопрос:</b>\n<blockquote>{q_text}</blockquote>\n{message.text}",
                 parse_mode="HTML",
                 reply_markup=ask_more_kb,
             )
