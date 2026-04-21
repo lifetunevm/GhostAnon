@@ -368,11 +368,19 @@ async def on_shutdown(bot: Bot):
     await bot.session.close()
 
 
-def main():
-    dp.startup.register(on_startup)
-    dp.shutdown.register(on_shutdown)
+async def on_app_startup(app):
+    await on_startup(bot)
 
+
+async def on_app_shutdown(app):
+    await on_shutdown(bot)
+
+
+def main():
     app = web.Application()
+
+    app.on_startup.append(on_app_startup)
+    app.on_shutdown.append(on_app_shutdown)
 
     async def handle_webhook(request):
         data = await request.json()
