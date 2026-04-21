@@ -102,3 +102,18 @@ async def get_question_by_id(question_id: int) -> dict | None:
     async with pool.acquire() as conn:
         row = await conn.fetchrow("SELECT * FROM questions WHERE id=$1", question_id)
         return dict(row) if row else None
+
+
+async def get_user_stats(user_id: int) -> tuple[int, int, int]:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        total = await conn.fetchval(
+            "SELECT COUNT(*) FROM questions WHERE target_user_id=$1", user_id,
+        )
+        answered = await conn.fetchval(
+            "SELECT COUNT(*) FROM questions WHERE target_user_id=$1 AND answered=TRUE", user_id,
+        )
+        unanswered = await conn.fetchval(
+            "SELECT COUNT(*) FROM questions WHERE target_user_id=$1 AND answered=FALSE", user_id,
+        )
+        return total or 0, answered or 0, unanswered or 0
