@@ -417,13 +417,11 @@ def main():
     async def handle_webhook(request):
         try:
             data = await request.json()
-            logger.info(f"Webhook received update")
             update = Update.model_validate(data, context={"bot": bot})
             await dp.feed_update(bot, update)
-            return web.Response(text="ok")
         except Exception as e:
             logger.error(f"Webhook handler error: {e}")
-            return web.Response(text="error", status=500)
+        return web.Response(text="ok")
 
     async def health_check(request):
         return web.Response(text="ok")
