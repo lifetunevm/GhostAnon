@@ -76,7 +76,7 @@ async def cmd_start(message: Message, state: FSMContext):
         await state.set_state(AskStates.waiting_for_question)
         await state.update_data(target_id=target_id)
         await message.answer(
-            f"Анонимный вопрос для <b>{target_name}</b>\n\n"
+            f"👻 Анонимный вопрос для <b>{target_name}</b>\n\n"
             f"Напиши свой вопрос ниже. Отправитель останется неизвестным.\n\n"
             f"<i>Твоё имя нигде не появится.</i>",
             parse_mode="HTML",
@@ -85,8 +85,8 @@ async def cmd_start(message: Message, state: FSMContext):
     else:
         link = get_ask_link(message.from_user.id)
         await message.answer(
-            f"Привет, <b>{message.from_user.first_name}</b>!\n\n"
-            f"Бот для анонимных вопросов. Поделись ссылкой — и тебе смогут "
+            f"👋 Привет, <b>{message.from_user.first_name}</b>!\n\n"
+            f"👻 Бот для анонимных вопросов. Поделись ссылкой — и тебе смогут "
             f"задавать вопросы анонимно.\n\n"
             f"<b>Твоя ссылка:</b>\n<blockquote>{link}</blockquote>\n"
             f"<b>Вставь в био так:</b>\n"
@@ -102,7 +102,7 @@ async def cmd_link(message: Message):
     await db.register_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
     link = get_ask_link(message.from_user.id)
     await message.answer(
-        f"<b>Твоя ссылка для анонимных вопросов:</b>\n\n"
+        f"🔗 <b>Твоя ссылка для анонимных вопросов:</b>\n\n"
         f"<blockquote>{link}</blockquote>\n"
         f"<b>Для био:</b>\n"
         f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</blockquote>",
@@ -113,16 +113,16 @@ async def cmd_link(message: Message):
 @router.message(Command("help"))
 async def cmd_help(message: Message):
     await message.answer(
-        "<b>Как пользоваться ботом</b>\n\n"
-        "<b>Получить ссылку</b> — /link\n"
+        "📖 <b>Как пользоваться ботом</b>\n\n"
+        "🔗 <b>Получить ссылку</b> — /link\n"
         "Вставь её в био Telegram, чтобы люди могли задавать тебе анонимные вопросы\n\n"
-        "<b>Мои вопросы</b> — /myquestions\n"
+        "📬 <b>Мои вопросы</b> — /myquestions\n"
         "Показывает все неотвеченные вопросы\n\n"
-        "<b>Статистика</b> — /stats\n"
+        "📊 <b>Статистика</b> — /stats\n"
         "Сколько вопросов получено и отвечено\n\n"
-        "<b>Отмена</b> — нажми кнопку «Отмена»\n"
+        "✖️ <b>Отмена</b> — нажми кнопку «Отмена»\n"
         "во время написания вопроса или ответа\n\n"
-        "<b>Совет:</b> добавь в био текст вида:\n"
+        "💡 <b>Совет:</b> добавь в био текст вида:\n"
         "<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</blockquote>",
         parse_mode="HTML",
     )
@@ -132,7 +132,7 @@ async def cmd_help(message: Message):
 async def cmd_myquestions(message: Message):
     questions = await db.get_unanswered_questions(message.from_user.id)
     if not questions:
-        await message.answer("Нет неотвеченных вопросов.")
+        await message.answer("📭 Нет неотвеченных вопросов.")
         return
 
     await message.answer(f"<b>Неотвеченные вопросы ({len(questions)}):</b>", parse_mode="HTML")
@@ -163,7 +163,7 @@ async def callback_menu_link(callback: CallbackQuery):
     await db.register_user(callback.from_user.id, callback.from_user.username, callback.from_user.first_name)
     link = get_ask_link(callback.from_user.id)
     await callback.message.edit_text(
-        f"<b>Твоя ссылка для анонимных вопросов:</b>\n\n"
+        f"🔗 <b>Твоя ссылка для анонимных вопросов:</b>\n\n"
         f"<blockquote>{link}</blockquote>\n"
         f"<b>Вставь в био так:</b>\n"
         f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</blockquote>\n"
@@ -180,7 +180,7 @@ async def callback_menu_link(callback: CallbackQuery):
 async def callback_menu_questions(callback: CallbackQuery):
     questions = await db.get_unanswered_questions(callback.from_user.id)
     if not questions:
-        text = "Нет неотвеченных вопросов."
+        text = "📭 Нет неотвеченных вопросов."
     else:
         text = f"<b>Неотвеченные вопросы ({len(questions)}):</b>\n\n"
         for i, q in enumerate(questions[:10], 1):
@@ -200,7 +200,7 @@ async def callback_menu_questions(callback: CallbackQuery):
 async def callback_menu_stats(callback: CallbackQuery):
     total_q, answered_q, unanswered_q = await db.get_user_stats(callback.from_user.id)
     await callback.message.edit_text(
-        f"<b>Твоя статистика</b>\n\n"
+        f"📊 <b>Твоя статистика</b>\n\n"
         f"Получено вопросов: <b>{total_q}</b>\n"
         f"Отвечено: <b>{answered_q}</b>\n"
         f"Ожидает ответа: <b>{unanswered_q}</b>",
@@ -215,16 +215,16 @@ async def callback_menu_stats(callback: CallbackQuery):
 @router.callback_query(F.data == "menu_help")
 async def callback_menu_help(callback: CallbackQuery):
     await callback.message.edit_text(
-        "<b>Как пользоваться ботом</b>\n\n"
-        "<b>Получить ссылку</b> — /link\n"
+        "📖 <b>Как пользоваться ботом</b>\n\n"
+        "🔗 <b>Получить ссылку</b> — /link\n"
         "Вставь её в био Telegram\n\n"
-        "<b>Мои вопросы</b> — /myquestions\n"
+        "📬 <b>Мои вопросы</b> — /myquestions\n"
         "Показывает неотвеченные вопросы\n\n"
-        "<b>Статистика</b> — /stats\n"
+        "📊 <b>Статистика</b> — /stats\n"
         "Сколько вопросов получено/отвечено\n\n"
-        "<b>Отмена</b> — кнопка «Отмена»\n"
+        "✖️ <b>Отмена</b> — кнопка «Отмена»\n"
         "при написании вопроса или ответа\n\n"
-        "<b>Совет:</b> добавь в био:\n"
+        "💡 <b>Совет:</b> добавь в био:\n"
         f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</blockquote>",
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -251,7 +251,7 @@ async def callback_menu_back(callback: CallbackQuery):
 @router.callback_query(F.data == "cancel")
 async def callback_cancel(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text("Отменено.", reply_markup=None)
+    await callback.message.edit_text("✖️ Отменено.", reply_markup=None)
     link = get_ask_link(callback.from_user.id)
     await callback.message.answer(
         f"<b>GhostAnon</b> — анонимные вопросы\n\n"
@@ -279,7 +279,7 @@ async def process_question(message: Message, state: FSMContext):
 
     await state.clear()
     await message.answer(
-        "Вопрос отправлен анонимно!",
+        "✅ Вопрос отправлен анонимно!",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Задать ещё", callback_data=f"askmore_{target_id}")]
         ]),
@@ -290,7 +290,7 @@ async def process_question(message: Message, state: FSMContext):
     ])
     await bot.send_message(
         target_id,
-        f"<b>Новый анонимный вопрос:</b>\n<blockquote>{message.text}</blockquote>",
+        f"👻 <b>Новый анонимный вопрос:</b>\n<blockquote>{message.text}</blockquote>",
         parse_mode="HTML",
         reply_markup=kb,
     )
@@ -327,7 +327,7 @@ async def callback_answer(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AskStates.waiting_for_answer)
     await state.update_data(question_id=q_id, sender_id=question["sender_user_id"])
     prompt = await callback.message.answer(
-        f"<b>Напиши ответ на вопрос:</b>\n<blockquote>{question['text']}</blockquote>",
+        f"✍️ <b>Напиши ответ на вопрос:</b>\n<blockquote>{question['text']}</blockquote>",
         parse_mode="HTML",
         reply_markup=cancel_kb(),
     )
@@ -364,7 +364,7 @@ async def process_answer(message: Message, state: FSMContext):
     except Exception:
         pass
 
-    await message.answer("Ответ отправлен!")
+    await message.answer("✅ Ответ отправлен!")
 
     if sender_id:
         try:
@@ -375,7 +375,7 @@ async def process_answer(message: Message, state: FSMContext):
             ])
             await bot.send_message(
                 sender_id,
-                f"<b>Ответ на твой анонимный вопрос:</b>\n<blockquote>{q_text}</blockquote>\n{message.text}",
+                f"💬 <b>Ответ на твой анонимный вопрос:</b>\n<blockquote>{q_text}</blockquote>\n{message.text}",
                 parse_mode="HTML",
                 reply_markup=ask_more_kb,
             )
