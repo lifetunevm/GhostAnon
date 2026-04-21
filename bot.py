@@ -4,11 +4,10 @@ from dotenv import load_dotenv
 from aiohttp import web
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Update
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.webhook.aiohttp_server import setup_application
 
 import db
 
@@ -192,12 +191,17 @@ def main():
     dp.shutdown.register(on_shutdown)
 
     app = web.Application()
-    setup_application(app, dp, bot=bot, path=WEBHOOK_PATH)
 
-    # Health check endpoint for Render
+    async def handle_webhook(request):
+        data = await request.json()
+        update = Update.model_validate(data, context={"bot": bot})
+        await dp.feed_update(bot, update)
+        return web.Response(text="ok")
+
     async def health_check(request):
         return web.Response(text="ok")
 
+    app.router.add_post(WEBHOOK_PATH, handle_webhook)
     app.router.add_get("/", health_check)
 
     web.run_app(app, host="0.0.0.0", port=WEBAPP_PORT)
