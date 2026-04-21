@@ -396,7 +396,12 @@ async def on_shutdown(bot: Bot):
 
 
 async def on_app_startup(app):
-    await on_startup(bot)
+    logger.info("on_app_startup called")
+    try:
+        await on_startup(bot)
+        logger.info("on_startup completed successfully")
+    except Exception as e:
+        logger.error(f"on_startup failed: {e}")
 
 
 async def on_app_shutdown(app):
@@ -410,10 +415,15 @@ def main():
     app.on_shutdown.append(on_app_shutdown)
 
     async def handle_webhook(request):
-        data = await request.json()
-        update = Update.model_validate(data, context={"bot": bot})
-        await dp.feed_update(bot, update)
-        return web.Response(text="ok")
+        try:
+            data = await request.json()
+            logger.info(f"Webhook received update")
+            update = Update.model_validate(data, context={"bot": bot})
+            await dp.feed_update(bot, update)
+            return web.Response(text="ok")
+        except Exception as e:
+            logger.error(f"Webhook handler error: {e}")
+            return web.Response(text="error", status=500)
 
     async def health_check(request):
         return web.Response(text="ok")
@@ -421,6 +431,7 @@ def main():
     app.router.add_post(WEBHOOK_PATH, handle_webhook)
     app.router.add_get("/", health_check)
 
+    logger.info(f"Starting bot on port {WEBAPP_PORT}, webhook_url={WEBHOOK_URL}")
     web.run_app(app, host="0.0.0.0", port=WEBAPP_PORT)
 
 
