@@ -326,11 +326,12 @@ async def callback_answer(callback: CallbackQuery, state: FSMContext):
 
     await state.set_state(AskStates.waiting_for_answer)
     await state.update_data(question_id=q_id, sender_id=question["sender_user_id"])
-    await callback.message.answer(
+    prompt = await callback.message.answer(
         f"<b>Напиши ответ на вопрос:</b>\n\n<blockquote>{question['text']}</blockquote>",
         parse_mode="HTML",
         reply_markup=cancel_kb(),
     )
+    await state.update_data(prompt_message_id=prompt.message_id)
     await callback.answer()
 
 
@@ -348,8 +349,21 @@ async def process_answer(message: Message, state: FSMContext):
         await message.answer("Ошибка. Попробуй ещё раз.")
         return
 
+    prompt_message_id = data.get("prompt_message_id")
+
     await db.save_answer(q_id, message.text)
     await state.clear()
+
+    if prompt_message_id:
+        try:
+            await bot.delete_message(message.chat.id, prompt_message_id)
+        except Exception:
+            pass
+    try:
+        await message.delete()
+    except Exception:
+        pass
+
     await message.answer("Ответ отправлен!", reply_markup=main_menu_kb())
 
     if sender_id:
