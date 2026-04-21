@@ -88,9 +88,9 @@ async def cmd_start(message: Message, state: FSMContext):
             f"Привет, <b>{message.from_user.first_name}</b>!\n\n"
             f"Бот для анонимных вопросов. Поделись ссылкой — и тебе смогут "
             f"задавать вопросы анонимно.\n\n"
-            f"<b>Твоя ссылка:</b>\n<code>{link}</code>\n\n"
+            f"<b>Твоя ссылка:</b>\n<blockquote>{link}</blockquote>\n"
             f"<b>Вставь в био так:</b>\n"
-            f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</code>\n\n"
+            f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</blockquote>\n"
             f"<i>Нажми на ссылку выше, чтобы скопировать</i>",
             parse_mode="HTML",
             reply_markup=main_menu_kb(),
@@ -103,9 +103,9 @@ async def cmd_link(message: Message):
     link = get_ask_link(message.from_user.id)
     await message.answer(
         f"<b>Твоя ссылка для анонимных вопросов:</b>\n\n"
-        f"<code>{link}</code>\n\n"
+        f"<blockquote>{link}</blockquote>\n"
         f"<b>Для био:</b>\n"
-        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</code>",
+        f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{message.from_user.id}</blockquote>"
         parse_mode="HTML",
     )
 
@@ -123,7 +123,7 @@ async def cmd_help(message: Message):
         "<b>Отмена</b> — нажми кнопку «Отмена»\n"
         "во время написания вопроса или ответа\n\n"
         "<b>Совет:</b> добавь в био текст вида:\n"
-        "<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</code>",
+        "<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</blockquote>",
         parse_mode="HTML",
     )
 
@@ -164,9 +164,9 @@ async def callback_menu_link(callback: CallbackQuery):
     link = get_ask_link(callback.from_user.id)
     await callback.message.edit_text(
         f"<b>Твоя ссылка для анонимных вопросов:</b>\n\n"
-        f"<code>{link}</code>\n\n"
+        f"<blockquote>{link}</blockquote>\n"
         f"<b>Вставь в био так:</b>\n"
-        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</code>\n\n"
+        f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</blockquote>\n"
         f"<i>Нажми на ссылку, чтобы скопировать</i>",
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -225,7 +225,7 @@ async def callback_menu_help(callback: CallbackQuery):
         "<b>Отмена</b> — кнопка «Отмена»\n"
         "при написании вопроса или ответа\n\n"
         "<b>Совет:</b> добавь в био:\n"
-        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</code>",
+        f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_...</blockquote>",
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Назад", callback_data="menu_back")]
@@ -239,9 +239,9 @@ async def callback_menu_back(callback: CallbackQuery):
     link = get_ask_link(callback.from_user.id)
     await callback.message.edit_text(
         f"<b>GhostAnon</b> — анонимные вопросы\n\n"
-        f"<b>Твоя ссылка:</b>\n<code>{link}</code>\n\n"
+        f"<b>Твоя ссылка:</b>\n<blockquote>{link}</blockquote>\n"
         f"<b>Вставь в био:</b>\n"
-        f"<code>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</code>",
+        f"<blockquote>Спроси меня: t.me/{BOT_USERNAME}?start=ask_{callback.from_user.id}</blockquote>",
         parse_mode="HTML",
         reply_markup=main_menu_kb(),
     )
@@ -255,7 +255,7 @@ async def callback_cancel(callback: CallbackQuery, state: FSMContext):
     link = get_ask_link(callback.from_user.id)
     await callback.message.answer(
         f"<b>GhostAnon</b> — анонимные вопросы\n\n"
-        f"<b>Твоя ссылка:</b>\n<code>{link}</code>",
+        f"<b>Твоя ссылка:</b>\n<blockquote>{link}</blockquote>",
         parse_mode="HTML",
         reply_markup=main_menu_kb(),
     )
@@ -290,7 +290,7 @@ async def process_question(message: Message, state: FSMContext):
     ])
     await bot.send_message(
         target_id,
-        f"<b>Новый анонимный вопрос:</b>\n\n<code>{message.text}</code>",
+        f"<b>Новый анонимный вопрос:</b>\n\n<blockquote>{message.text}</blockquote>",
         parse_mode="HTML",
         reply_markup=kb,
     )
@@ -327,7 +327,7 @@ async def callback_answer(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AskStates.waiting_for_answer)
     await state.update_data(question_id=q_id, sender_id=question["sender_user_id"])
     await callback.message.answer(
-        f"<b>Напиши ответ на вопрос:</b>\n\n<code>{question['text']}</code>",
+        f"<b>Напиши ответ на вопрос:</b>\n\n<blockquote>{question['text']}</blockquote>",
         parse_mode="HTML",
         reply_markup=cancel_kb(),
     )
@@ -361,7 +361,7 @@ async def process_answer(message: Message, state: FSMContext):
             ])
             await bot.send_message(
                 sender_id,
-                f"<b>Ответ на твой анонимный вопрос:</b>\n\n<code>{q_text}</code>\n\n{message.text}",
+                f"<b>Ответ на твой анонимный вопрос:</b>\n\n<blockquote>{q_text}</blockquote>\n\n{message.text}",
                 parse_mode="HTML",
                 reply_markup=ask_more_kb,
             )
